@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "SotwareTesting",
+    "SoftwareTesting",
 ]
 
 MIDDLEWARE = [
@@ -83,6 +83,7 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "testing_db",
+        "USER": "postgres",
         "PASSWORD": "6862",
         "HOST": "localhost",
         "PORT": "5432",
