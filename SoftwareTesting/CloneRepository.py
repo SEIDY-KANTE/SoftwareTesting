@@ -3,6 +3,7 @@ from django.core.validators import URLValidator
 import os
 import subprocess
 from os import environ
+from SoftwareTesting.config import DIRECTORY
 
 
 class CloneRepositoryForm(forms.Form):
@@ -23,7 +24,6 @@ class CloneRepositoryForm(forms.Form):
 
         url = self.cleaned_data["url"]
 
-        directory = os.getcwd()
         en = environ.copy()
         en["GIT_TERMINAL_PROMPT"] = "0"
         try:
@@ -32,7 +32,7 @@ class CloneRepositoryForm(forms.Form):
             if completed.returncode != 0:
                 return (False, f"Uppps!! Error {completed.returncode}!")
 
-            return (True, f"Repository cloned successfully to {directory}")
+            return (True, f"Repository cloned successfully to {DIRECTORY}")
 
         except subprocess.CalledProcessError as error:
             return (False, f"Error cloning repository: {error}")

@@ -2,18 +2,37 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from SoftwareTesting.models import Metrics
 from SoftwareTesting.CloneRepository import CloneRepositoryForm
+from SoftwareTesting.tools import get_java_files
+from SoftwareTesting.Analyzer import Analyzer
+from django.db import transaction
 
 
 def index(request):
 
     if request.method == "POST":
 
-        metrics = Metrics.objects.all()
         metric = CloneRepositoryForm(request.POST)
+
+        # print(len(metrics))
 
         if metric.is_valid():
             (is_cloned, message) = metric.clone_repo()
             # print("INPUT URL: ", request.POST["url"])
+
+            java_files = get_java_files()
+            # index = 0
+            with transaction.atomic():
+                for file in java_files:
+                    analyzed_data = Analyzer.analyze(file)
+                    # index += 1
+                    metrics = Metrics(**analyzed_data)
+                    metrics.save()
+
+                    # print(f"\n==================={index}. {file} ===================\n")
+                    # print(analyzed_data)
+
+
+            metrics = Metrics.objects.all()
 
             if is_cloned:
                 return render(request, "Result.html", {"metrics": metrics})

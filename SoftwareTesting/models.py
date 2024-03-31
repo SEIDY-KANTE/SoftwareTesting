@@ -3,8 +3,7 @@ from django.db import models
 
 class Metrics(models.Model):
 
-    Id = models.AutoField(primary_key=True)
-    ClassName = models.CharField(max_length=70)
+    ClassName = models.CharField(primary_key=True, max_length=70)
     JavaDocLines = models.IntegerField()
     OtherComments = models.IntegerField()
     CodeLines = models.IntegerField()
