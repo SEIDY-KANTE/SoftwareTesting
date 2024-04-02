@@ -50,7 +50,6 @@ def index(request):
     # Render the index template for GET requests
     return render(request, "index.html")
 
-
 def result(request):
     # Fetch all metrics from the database and render the result template
     metrics = Metrics.objects.all()
