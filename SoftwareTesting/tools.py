@@ -1,9 +1,9 @@
+from SoftwareTesting.config import *
 import os
 import re
-from SoftwareTesting.config import *
 
 
-def get_java_files():
+def get_java_files(directory):
     """
     Retrieves all files with the .java extension within a DIRECTORY.
 
@@ -12,7 +12,7 @@ def get_java_files():
     """
 
     java_files = []
-    for root, _, files in os.walk(DIRECTORY):
+    for root, _, files in os.walk(directory):
         for file in files:
             if file.endswith(".java"):
                 java_files.append(os.path.join(root, file))

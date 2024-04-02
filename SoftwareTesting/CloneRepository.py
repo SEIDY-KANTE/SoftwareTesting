@@ -20,19 +20,32 @@ class CloneRepositoryForm(forms.Form):
         ],
     )
 
-    def clone_repo(self):
+    def clone_repo(self, directory):
 
-        url = self.cleaned_data["url"]
+        url = self.data.get("url")  # Using .get() to avoid KeyError
+
+        if not url:
+            return (False, "URL is not provided")
 
         en = environ.copy()
         en["GIT_TERMINAL_PROMPT"] = "0"
         try:
-            completed = subprocess.run(["git", "clone", url], env=en)
+            completed = subprocess.run(
+                ["git", "clone", url], env=en, capture_output=True, text=True
+            )
 
             if completed.returncode != 0:
-                return (False, f"Uppps!! Error {completed.returncode}!")
 
-            return (True, f"Repository cloned successfully to {DIRECTORY}")
+                # return (
+                #     False,
+                #     completed.stderr.strip(),
+                # )
 
-        except subprocess.CalledProcessError as error:
-            return (False, f"Error cloning repository: {error}")
+                return (False, "Error cloning repository")
+
+            return (True, f"Repository cloned successfully to {directory}")
+
+        # except subprocess.CalledProcessError as error:
+        #     return (False, f"Error cloning repository")
+        except:
+            return (False, "Error cloning repository")

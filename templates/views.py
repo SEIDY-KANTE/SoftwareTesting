@@ -5,6 +5,7 @@ from SoftwareTesting.CloneRepository import CloneRepositoryForm
 from SoftwareTesting.tools import get_java_files
 from SoftwareTesting.Analyzer import Analyzer
 from django.db import transaction
+from SoftwareTesting.config import DIRECTORY
 
 
 def index(request):
@@ -16,10 +17,10 @@ def index(request):
         # print(len(metrics))
 
         if metric.is_valid():
-            (is_cloned, message) = metric.clone_repo()
+            (is_cloned, message) = metric.clone_repo(DIRECTORY)
             # print("INPUT URL: ", request.POST["url"])
 
-            java_files = get_java_files()
+            java_files = get_java_files(DIRECTORY)
             # index = 0
             with transaction.atomic():
                 for file in java_files:
@@ -30,7 +31,6 @@ def index(request):
 
                     # print(f"\n==================={index}. {file} ===================\n")
                     # print(analyzed_data)
-
 
             metrics = Metrics.objects.all()
 
