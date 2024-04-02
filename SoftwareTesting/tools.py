@@ -2,20 +2,25 @@ from SoftwareTesting.config import *
 import os
 import re
 
-
 def get_java_files(directory):
     """
     Retrieves all files with the .java extension within a DIRECTORY.
+    Excludes files representing Java interfaces that start with "I".
 
     Returns:
-        list: A list of absolute paths to all discovered Java files.
+        list: A list of absolute paths to all discovered Java files excluding interfaces.
     """
-
     java_files = []
     for root, _, files in os.walk(directory):
         for file in files:
             if file.endswith(".java"):
-                java_files.append(os.path.join(root, file))
+                # Check if the file represents an interface
+                if not file.startswith("I"):
+                    java_files.append(os.path.join(root, file))
+                # Check if the file represents a class and not an interface
+                elif file.startswith("I") and file[1].islower():
+                    java_files.append(os.path.join(root, file))
+
     return java_files
 
 
