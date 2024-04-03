@@ -44,6 +44,7 @@ These metrics are calculated separately for each class and presented to the user
   <img src="https://github.com/SEIDY-KANTE/SoftwareTesting/blob/main/Screenshots/result_page.png" alt="Result Page" width="400"  />
   <img src="https://github.com/SEIDY-KANTE/SoftwareTesting/blob/main/Screenshots/error_cloning_page.png" alt="Error Cloning Page" width="400"  />
   <img src="https://github.com/SEIDY-KANTE/SoftwareTesting/blob/main/Screenshots/invalid_form_page.png" alt="Invalid Form Page" width="400"  />
+   <img src="https://github.com/SEIDY-KANTE/SoftwareTesting/blob/main/Screenshots/test_output.png" alt="Test Output" />
 </div>
 
 **Conclusion:**
