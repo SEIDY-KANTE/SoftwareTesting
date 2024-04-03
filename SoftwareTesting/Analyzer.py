@@ -7,6 +7,7 @@ from SoftwareTesting.tools import (
     count_code_lines,
     count_functions,
     calculate_comment_deviation,
+    remove_javadoc_comments,
 )
 from SoftwareTesting.config import *
 
@@ -30,8 +31,15 @@ class Analyzer:
         content = read_and_decode_file(filename)
 
         metrics[LOC] = count_lines(content)
-        metrics[JAVADOC_LINES] = count_javadoc_comments(content)
-        metrics[OTHER_COMMENTS] = count_comments(content) - metrics[JAVADOC_LINES]
+
+        javadoc_removed_content = remove_javadoc_comments(content)
+        metrics[JAVADOC_LINES] = count_javadoc_comments(
+            content
+        ) - count_javadoc_comments(javadoc_removed_content)
+        metrics[OTHER_COMMENTS] = count_comments(
+            javadoc_removed_content
+        ) + count_javadoc_comments(javadoc_removed_content)
+
         filtred_content = remove_comments(content)
         metrics[CODE_LINES] = count_code_lines(filtred_content)
 

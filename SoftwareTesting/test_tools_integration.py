@@ -8,7 +8,6 @@ import os
 import tempfile
 from SoftwareTesting.tools import (
     get_java_files,
-    read_and_decode_file,
     count_lines,
     remove_comments,
     count_code_lines,
@@ -16,6 +15,7 @@ from SoftwareTesting.tools import (
     count_javadoc_comments,
     count_functions,
     calculate_comment_deviation,
+    remove_javadoc_comments,
 )
 from SoftwareTesting.config import (
     FUNCTIONS,
@@ -58,14 +58,6 @@ class TestToolsIntegration(unittest.TestCase):
         for file in java_files:
             self.assertTrue(file.endswith(".java"))
 
-    # def test_read_and_decode_file(self):
-    #     for file_name, content in zip(self.test_files, self.test_contents):
-    #         file_path = os.path.join(self.temp_dir.name, file_name)
-    #         # Read and decode each temporary file
-    #         decoded_content = read_and_decode_file(file_path)
-    #         # Check if the decoded content matches the original content
-    #         self.assertEqual(decoded_content.strip(), content.strip())
-
     def test_count_lines(self):
         for file_name, content in zip(self.test_files, self.test_contents):
             file_path = os.path.join(self.temp_dir.name, file_name)
@@ -91,22 +83,64 @@ class TestToolsIntegration(unittest.TestCase):
             # Check if the counted lines match the expected number of code lines
             self.assertEqual(code_line_count, content.count("\n") + 1)
 
-    def test_count_comments(self):
-        for file_name, content in zip(self.test_files, self.test_contents):
-            file_path = os.path.join(self.temp_dir.name, file_name)
-            # Count lines of comments in each temporary file
-            comment_line_count = count_comments(content)
-            # Check if the counted lines match the expected number of comment lines
-            expected_comment_lines = content.count("//") + content.count("/*")
-            self.assertEqual(comment_line_count, expected_comment_lines)
+    def test_count_comments_integration(self):
+        # Create a temporary Java file with known content
+        with tempfile.NamedTemporaryFile(mode="w", delete=False) as temp_file:
+            temp_file.write("// Single-line comment 1\n")
+            temp_file.write("// Single-line comment 2\n")
+            temp_file.write("public class Test {\n")
+            temp_file.write("}")
 
-    def test_count_javadoc_comments(self):
-        for file_name, content in zip(self.test_files, self.test_contents):
-            file_path = os.path.join(self.temp_dir.name, file_name)
-            # Count lines of Javadoc comments in each temporary file
-            javadoc_comment_line_count = count_javadoc_comments(content)
-            # Check if the counted lines match the expected number of Javadoc comment lines
-            self.assertEqual(javadoc_comment_line_count, content.count("/**"))
+        # Read the content of the temporary file
+        with open(temp_file.name, "r") as file:
+            content = file.read()
+
+        # Test count_comments function
+        self.assertEqual(count_comments(content), 2)
+
+        # Clean up the temporary file
+        os.remove(temp_file.name)
+
+    def test_remove_javadoc_comments_integration(self):
+        # Create a temporary Java file with known content
+        with tempfile.NamedTemporaryFile(mode="w", delete=False) as temp_file:
+            temp_file.write("public class Test {\n")
+            temp_file.write("/**\n")
+            temp_file.write(" * This is a Javadoc comment\n")
+            temp_file.write(" */\n")
+            temp_file.write("}")
+
+        # Read the content of the temporary file
+        with open(temp_file.name, "r") as file:
+            content = file.read()
+
+        # Test remove_javadoc_comments function
+        modified_content = remove_javadoc_comments(content)
+        self.assertNotIn("/**", modified_content)
+        self.assertNotIn("*/", modified_content)
+        self.assertNotIn("*", modified_content)
+
+        # Clean up the temporary file
+        os.remove(temp_file.name)
+
+    def test_count_javadoc_comments_integration(self):
+        # Create a temporary Java file with known content
+        with tempfile.NamedTemporaryFile(mode="w", delete=False) as temp_file:
+            temp_file.write("public class Test {\n")
+            temp_file.write("/**\n")
+            temp_file.write(" * This is a Javadoc comment\n")
+            temp_file.write(" */\n")
+            temp_file.write("}")
+
+        # Read the content of the temporary file
+        with open(temp_file.name, "r") as file:
+            content = file.read()
+
+        # Test count_javadoc_comments function
+        self.assertEqual(count_javadoc_comments(content), 1)
+
+        # Clean up the temporary file
+        os.remove(temp_file.name)
 
     def test_count_functions(self):
         for file_name, content in zip(self.test_files, self.test_contents):
@@ -127,7 +161,6 @@ class TestToolsIntegration(unittest.TestCase):
         }
         deviation = calculate_comment_deviation(metrics)
         self.assertAlmostEqual(deviation, -78.66, delta=0.01)
-
 
 
 if __name__ == "__init__":

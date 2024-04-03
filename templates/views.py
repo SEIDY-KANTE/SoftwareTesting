@@ -12,18 +12,21 @@ def index(request):
         # Process form submission
         clone_form = CloneRepositoryForm(request.POST)
         if clone_form.is_valid():
+
             # Clone repository and analyze Java files
             is_cloned, message = clone_form.clone_repo(DIRECTORY)
+            # If cloning was successful, analyze Java files and save metrics
+            java_files = get_java_files(DIRECTORY)
+            with transaction.atomic():
+                for file in java_files:
+                    analyzed_data = Analyzer.analyze(file)
+                    metrics = Metrics(**analyzed_data)
+                    metrics.save()
+
+            # Fetch all metrics from the database
+            metrics = Metrics.objects.all()
+            
             if is_cloned:
-                # If cloning was successful, analyze Java files and save metrics
-                java_files = get_java_files(DIRECTORY)
-                with transaction.atomic():
-                    for file in java_files:
-                        analyzed_data = Analyzer.analyze(file)
-                        metrics = Metrics(**analyzed_data)
-                        metrics.save()
-                # Fetch all metrics from the database
-                metrics = Metrics.objects.all()
                 # Render the result template with metrics
                 return render(request, "Result.html", {"metrics": metrics})
             else:

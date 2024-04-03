@@ -2,6 +2,7 @@ from SoftwareTesting.config import *
 import os
 import re
 
+
 def get_java_files(directory):
     """
     Retrieves all files with the .java extension within a DIRECTORY.
@@ -106,23 +107,68 @@ def count_comments(content):
         int: The number of lines containing comments (other than Javadoc).
     """
 
-    other_comment = r"(?s)//.*?$|/\*.*?\*/"
-    return len(re.findall(other_comment, content, re.MULTILINE | re.DOTALL))
+    # Regular expression pattern for single-line comments
+    single_line_comment_pattern = r"(?s)//.*?"
+
+    # Count single-line comments
+    single_line_comments_count = len(re.findall(single_line_comment_pattern, content))
+
+    return single_line_comments_count
+
+
+def remove_javadoc_comments(content):
+    """
+    Removes Javadoc comments from Java content.
+
+    Args:
+        content (str): The Java content string.
+
+    Returns:
+        str: The Java content string with Javadoc comments removed.
+    """
+
+    # Regular expression pattern for Javadoc comments
+    javadoc_comment_pattern = r"/\*\*.*?\*/"
+
+    # Remove Javadoc comments
+    code_without_javadoc_comments = re.sub(
+        javadoc_comment_pattern, "", content, flags=re.MULTILINE | re.DOTALL
+    )
+
+    return code_without_javadoc_comments
 
 
 def count_javadoc_comments(content):
     """
-    Counts the lines of Javadoc comments in a Java class file.
+    Counts the number of lines in a Javadoc content.
 
     Args:
-        content (str): The decoded content of the Java class file.
+        content (str): The Javadoc content as a string.
 
     Returns:
-        int: The number of lines containing Javadoc comments.
+        int: The number of lines in the Javadoc content.
     """
+    # Regular expression pattern for Javadoc content lines
+    javadoc_line_regex = r"^\s*\*.*$"
 
-    javadoc_comment = r"/\*\*.*?\*/"
-    return len(re.findall(javadoc_comment, content, re.DOTALL | re.MULTILINE))
+    # Split the lines of the Javadoc content
+    lines = content.strip().split("\n")
+
+    # Filter lines of the Javadoc content
+    javadoc_lines = [
+        line
+        for line in lines
+        if line.strip()
+        and not line.strip().startswith("/*")
+        and not line.strip().endswith("*/")
+    ]
+
+    # Count lines matching the Javadoc line regex
+    javadoc_lines_count = sum(
+        1 for line in javadoc_lines if re.match(javadoc_line_regex, line)
+    )
+
+    return javadoc_lines_count
 
 
 def count_functions(content):
