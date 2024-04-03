@@ -1,4 +1,4 @@
-from SoftwareTesting.models import Metrics
+from SoftwareTesting.models.models import Metrics
 import unittest
 
 class TestMetrics(unittest.TestCase):

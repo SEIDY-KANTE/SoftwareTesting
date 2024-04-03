@@ -1,11 +1,11 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.db import transaction
-from SoftwareTesting.models import Metrics
-from SoftwareTesting.CloneRepository import CloneRepositoryForm
-from SoftwareTesting.tools import get_java_files
-from SoftwareTesting.Analyzer import Analyzer
-from SoftwareTesting.config import DIRECTORY
+from SoftwareTesting.models.models import Metrics
+from SoftwareTesting.models.CloneRepository import CloneRepositoryForm
+from SoftwareTesting.utils.tools import get_java_files
+from SoftwareTesting.models.Analyzer import Analyzer
+from SoftwareTesting.utils.config import DIRECTORY
 
 def index(request):
     if request.method == "POST":

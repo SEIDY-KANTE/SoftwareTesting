@@ -2,7 +2,7 @@ import unittest
 import os
 import tempfile
 from faker import Faker
-from SoftwareTesting.tools import (
+from SoftwareTesting.utils.tools import (
     get_java_files,
     read_and_decode_file,
     count_lines,
@@ -15,7 +15,7 @@ from SoftwareTesting.tools import (
     remove_javadoc_comments,
 )
 
-from SoftwareTesting.config import (
+from SoftwareTesting.utils.config import (
     FUNCTIONS,
     CODE_LINES,
     JAVADOC_LINES,

@@ -3,7 +3,7 @@ import os
 import tempfile
 from faker import Faker
 from parameterized import parameterized
-from SoftwareTesting.tools import (
+from SoftwareTesting.utils.tools import (
     get_java_files,
     count_lines,
     count_comments,
@@ -14,7 +14,7 @@ from SoftwareTesting.tools import (
     remove_javadoc_comments,
 )
 
-from SoftwareTesting.config import (
+from SoftwareTesting.utils.config import (
     FUNCTIONS,
     CODE_LINES,
     JAVADOC_LINES,

@@ -1,4 +1,4 @@
-from SoftwareTesting.config import *
+from SoftwareTesting.utils.config import *
 import os
 import re
 

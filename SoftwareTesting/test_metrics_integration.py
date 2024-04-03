@@ -1,5 +1,5 @@
 from django.test import TestCase
-from SoftwareTesting.models import Metrics
+from SoftwareTesting.models.models import Metrics
 import unittest
 
 class TestMetricsIntegration(TestCase):

@@ -1,4 +1,4 @@
-from SoftwareTesting.tools import (
+from SoftwareTesting.utils.tools import (
     read_and_decode_file,
     count_lines,
     count_javadoc_comments,
@@ -9,7 +9,7 @@ from SoftwareTesting.tools import (
     calculate_comment_deviation,
     remove_javadoc_comments,
 )
-from SoftwareTesting.config import *
+from SoftwareTesting.utils.config import *
 
 
 class Analyzer:

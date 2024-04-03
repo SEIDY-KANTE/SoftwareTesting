@@ -6,7 +6,7 @@ They ensure that the functions interact correctly with these files and produce t
 import unittest
 import os
 import tempfile
-from SoftwareTesting.tools import (
+from SoftwareTesting.utils.tools import (
     get_java_files,
     count_lines,
     remove_comments,
@@ -17,7 +17,7 @@ from SoftwareTesting.tools import (
     calculate_comment_deviation,
     remove_javadoc_comments,
 )
-from SoftwareTesting.config import (
+from SoftwareTesting.utils.config import (
     FUNCTIONS,
     CODE_LINES,
     JAVADOC_LINES,

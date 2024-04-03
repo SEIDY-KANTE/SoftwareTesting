@@ -1,4 +1,4 @@
-from SoftwareTesting.CloneRepository import CloneRepositoryForm
+from SoftwareTesting.models.CloneRepository import CloneRepositoryForm
 from parameterized import parameterized
 import unittest
 import os

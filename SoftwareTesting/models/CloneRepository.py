@@ -3,7 +3,7 @@ from django.core.validators import URLValidator
 import os
 import subprocess
 from os import environ
-from SoftwareTesting.config import DIRECTORY
+from SoftwareTesting.utils.config import DIRECTORY
 
 
 class CloneRepositoryForm(forms.Form):
