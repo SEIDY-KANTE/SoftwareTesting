@@ -3,6 +3,12 @@ from parameterized import parameterized
 import unittest
 import os
 
+"""
+This test case class contains unit tests for the CloneRepositoryForm class without using mock objects.
+Some tests can be considered as integration tests.
+"""
+
+
 class TestCloneRepositoryForm(unittest.TestCase):
 
     def remove_repo(self, url):
@@ -27,6 +33,7 @@ class TestCloneRepositoryForm(unittest.TestCase):
     def test_valid_url(self):
         self.assertTrue(self.form.is_valid())
 
+    # This test needs internet connection to pass
     def test_clone_repo(self):
 
         # Call the clone_repo method
@@ -56,6 +63,8 @@ class TestCloneRepositoryForm(unittest.TestCase):
         self.assertEqual(form.errors["url"], ["Invalid GitHub URL"])
 
     ####################################### PARAMETERIZED #################################
+
+    # This test needs internet connection to pass
 
     @parameterized.expand(
         [
@@ -103,7 +112,6 @@ class TestCloneRepositoryForm(unittest.TestCase):
     def test_url_validation(self, name, data, expected_validity):
         form = CloneRepositoryForm(data=data)
         self.assertEqual(form.is_valid(), expected_validity)
-
 
 
 if __name__ == "__init__":

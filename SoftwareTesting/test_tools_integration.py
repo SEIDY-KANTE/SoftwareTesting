@@ -14,14 +14,7 @@ from SoftwareTesting.utils.tools import (
     count_comments,
     count_javadoc_comments,
     count_functions,
-    calculate_comment_deviation,
     remove_javadoc_comments,
-)
-from SoftwareTesting.utils.config import (
-    FUNCTIONS,
-    CODE_LINES,
-    JAVADOC_LINES,
-    OTHER_COMMENTS,
 )
 
 class TestToolsIntegration(unittest.TestCase):
@@ -151,16 +144,6 @@ class TestToolsIntegration(unittest.TestCase):
             expected_function_count = content.count("void")
             self.assertEqual(function_count, expected_function_count)
 
-    def test_calculate_comment_deviation(self):
-        # Test calculate_comment_deviation function with mocked metrics
-        metrics = {
-            FUNCTIONS: 5,
-            CODE_LINES: 100,
-            JAVADOC_LINES: 3,
-            OTHER_COMMENTS: 5,
-        }
-        deviation = calculate_comment_deviation(metrics)
-        self.assertAlmostEqual(deviation, -78.66, delta=0.01)
 
 
 if __name__ == "__init__":

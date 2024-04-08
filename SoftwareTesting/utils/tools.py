@@ -25,20 +25,19 @@ def get_java_files(directory):
     return java_files
 
 
-def read_and_decode_file(filename):
-    """
-    Reads the content of a Java class file and decodes it to a string.
+def read_and_decode_file(file_path):
+    """Reads a file and decodes its content (assuming UTF-8 encoding).
 
     Args:
-        filename (str): Path to the Java class file.
+        file_path (str): The path to the file to read.
 
     Returns:
-        str: The decoded content of the Java class file.
+        str: The decoded content of the file.
     """
 
-    with open(filename, "rb") as file:
+    with open(file_path, "r", encoding="utf-8") as file:
         content = file.read()
-        return content.decode("utf-8")
+    return content
 
 
 def count_lines(content):

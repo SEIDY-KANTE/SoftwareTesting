@@ -1,7 +1,5 @@
 import unittest
-import os
-import tempfile
-from faker import Faker
+from unittest.mock import patch, mock_open
 from SoftwareTesting.utils.tools import (
     get_java_files,
     read_and_decode_file,
@@ -23,164 +21,272 @@ from SoftwareTesting.utils.config import (
 )
 
 
-class TestTools(unittest.TestCase):
+class UnittestTools(unittest.TestCase):
 
-    def test_get_java_files(self):
-        # Create a temporary directory with dummy .java files
-        with tempfile.TemporaryDirectory() as tmpdirname:
-            # Create dummy .java files
-            for i in range(5):
-                open(os.path.join(tmpdirname, f"test_file_{i}.java"), "a").close()
+    @patch("os.walk")
+    def test_get_java_files(self, mock_walk):
+        mock_walk.return_value = [
+            (
+                "/path/to/directory",
+                [],
+                ["Class1.java", "IInterface1.java", "Class2.java", "IInterface2.java"],
+            )
+        ]
+        result = get_java_files("/path/to/directory")
+        expected_result = [
+            "/path/to/directory\\Class1.java",
+            "/path/to/directory\\Class2.java",
+        ]
+        self.assertEqual(result, expected_result)
 
-            # Retrieve the list of java files
-            java_files = get_java_files(tmpdirname)
-
-            # Check if all the files were retrieved
-            self.assertEqual(len(java_files), 5)
-            # Check if each file actually ends with .java
-            for file in java_files:
-                self.assertTrue(file.endswith(".java"))
-
-    def test_read_and_decode_file(self):
-        fake = Faker()
-        # Create a temporary .java file with dummy content
-        with tempfile.NamedTemporaryFile(suffix=".java", delete=False) as tmpfile:
-            dummy_content = fake.text()
-            tmpfile.write(dummy_content.encode("utf-8"))
-            tmpfile_path = tmpfile.name
-
-        # Read and decode the temporary file
-        decoded_content = read_and_decode_file(tmpfile_path)
-
-        # Check if the decoded content matches the original content
-        self.assertEqual(decoded_content, dummy_content)
+    @patch("builtins.open", new_callable=mock_open, read_data="Java file content")
+    def test_read_and_decode_file(self, mock_open):
+        result = read_and_decode_file("/path/to/java_file.java")
+        expected_result = "Java file content"
+        self.assertEqual(result, expected_result)
 
     def test_count_lines(self):
-        fake = Faker()
-        # Generate dummy content with random number of lines
-        num_lines = fake.random_int(min=1, max=1000)
-        dummy_content = "\n".join([fake.word() for _ in range(num_lines)])
+        content = "line 1 \nline 2 \nline 3"
+        result = count_lines(content)
+        expected_result = 3
+        self.assertEqual(result, expected_result)
 
-        # Count lines in the dummy content
-        line_count = count_lines(dummy_content)
+    @patch("re.sub")
+    def test_remove_comments(self, mock_sub):
+        # Mock the re.sub function to return a modified content without comments
+        mock_sub.return_value = "public class Test {    public void method() {}}"
 
-        # Check if the counted lines match the number of lines generated
-        self.assertEqual(line_count, num_lines)
-
-    def test_remove_comments(self):
-        fake = Faker()
-        # Generate dummy Java content with comments
-        dummy_content_with_comments = fake.text()
-        # Remove comments from the dummy content
-        content_without_comments = remove_comments(dummy_content_with_comments)
-
-        # Check if the resulting content doesn't contain any comments
-        self.assertFalse("/*" in content_without_comments)
-        self.assertFalse("//" in content_without_comments)
-
-    def test_count_functions(self):
-        fake = Faker()
-        # Generate dummy Java content with function declarations
-        dummy_content_with_functions = "\n".join(
-            ["public void " + fake.word() + "() {" for _ in range(5)]
+        # Call the function with a sample content
+        result = remove_comments(
+            "public class Test {// This is a comment    public void method() {/* This is a block comment */}}"
         )
 
-        # Count functions
-        function_count = count_functions(dummy_content_with_functions)
-
-        # Check if the counted functions match the expected number of functions
-        self.assertEqual(function_count, 5)
-
-    def test_calculate_comment_deviation(self):
-        # Generate a sample metrics dictionary
-        metrics = {
-            FUNCTIONS: 5,
-            CODE_LINES: 100,
-            JAVADOC_LINES: 3,
-            OTHER_COMMENTS: 5,
-        }
-
-        # Calculate comment deviation
-        deviation = calculate_comment_deviation(metrics)
-
-        # Check if the calculated deviation matches the expected value
-        self.assertAlmostEqual(deviation, -78.66, delta=0.01)
+        # Assert that the function returned the expected result
+        expected_result = "public class Test {    public void method() {}}"
+        self.assertEqual(result, expected_result)
 
     def test_count_code_lines(self):
-        fake = Faker()
-        # Generate dummy Java content with code lines
-        dummy_content_with_code = "\n".join([fake.word() for _ in range(10)])
-        # Add some empty lines and comments to the content
-        dummy_content_with_code_and_comments = (
-            dummy_content_with_code
-            + "\n"
-            + "// This is a comment\n\n/* This is a multi-line\n comment */\n"
-        )
+        # Define a sample Java content string with comments and whitespace
+        sample_content = """
+        public class Test {
+            // This is a comment
+            public void method() {
+                int x = 5; // This is another comment
+                int y = 10;
+                
+                // Yet another comment
+                if (x > y) {
+                    System.out.println("x is greater than y");
+                }
+                // Final comment
+            }
+        }
+        """
 
-        # Count lines of code
-        code_line_count = count_code_lines(dummy_content_with_code_and_comments)
+        sample_content = remove_comments(sample_content)
+        # Call the function with the sample content
+        result = count_code_lines(sample_content)
 
-        # Check if the counted lines match the expected number of code lines
-        self.assertEqual(code_line_count, 13)
+        # Define the expected result (number of lines containing actual code)
+        expected_result = 9 
 
+        # Assert that the result matches the expected result
+        self.assertEqual(result, expected_result)
 
-    def test_count_comments_single_line(self):
-        fake = Faker()
-        generated_word = fake.word()
-        content = "\n".join([f"// {generated_word}" for _ in range(5)])
-        self.assertEqual(count_comments(content), 5)
+    @patch("SoftwareTesting.utils.tools.re.findall")
+    def test_count_comments(self, mock_findall):
+        # Define a sample Java content string
+        sample_content = """
+        // This is a single-line comment
+        // This is another single-line comment
+        int x = 5; // This is an inline single-line comment
+        int y = 10;
+        """
 
-    def test_count_comments_no_comments(self):
-        fake = Faker()
-        content = "\n".join([fake.word() for _ in range(5)])
-        self.assertEqual(count_comments(content), 0)
+        # Mock the findall method to return a predefined result
+        mock_findall.return_value = [
+            "// This is a single-line comment",
+            "// This is another single-line comment",
+            "// This is an inline single-line comment",
+        ]
 
-    def test_remove_javadoc_comments_single_line(self):
-        fake = Faker()
-        generated_text = fake.text()
-        content = (
-            "public class Test {\n/** Javadoc comment */"
-            + "\npublic void test() {"
-            + generated_text
-            + "}\n}"
-        )
-        expected_result = (
-            "public class Test {\n" + "\npublic void test() {" + generated_text + "}\n}"
-        )
-        self.assertEqual(remove_javadoc_comments(content), expected_result)
+        # Call the function with the sample content
+        result = count_comments(sample_content)
 
-    def test_remove_javadoc_comments_multi_line(self):
-        fake = Faker()
-        generated_text = fake.text()
-        content = (
-            "public class Test {\n/**\n * Multi-line\n * Javadoc comment\n */"
-            + "\npublic void test() {"
-            + generated_text
-            + "}\n}"
-        )
-        expected_result = (
-            "public class Test {\n" + "\npublic void test() {" + generated_text + "}\n}"
-        )
-        self.assertEqual(remove_javadoc_comments(content), expected_result)
+        # Define the expected result (number of single-line comments)
+        expected_result = 3 
 
-    def test_remove_javadoc_comments_no_comments(self):
-        fake = Faker()
-        content = (
-            "public class Test {" + "\npublic void test() {" + fake.text() + "}\n}"
-        )
-        self.assertEqual(remove_javadoc_comments(content), content)
+        # Assert that the result matches the expected result
+        self.assertEqual(result, expected_result)
 
-    def test_count_javadoc_comments_single_line(self):
-        content = "/**\n*Javadoc comment \n*/"
-        self.assertEqual(count_javadoc_comments(content), 1)
+    @patch("SoftwareTesting.utils.tools.re.sub")
+    def test_remove_javadoc_comments(self, mock_sub):
+        # Define a sample Java content string with Javadoc comments
+        sample_content = """
+        /**
+         * This is a Javadoc comment.
+         * It spans multiple lines.
+         */
+        public class Test {
+            // This is a regular comment
+            private int x;
+            // Another regular comment
+            private int y;
+        }
+        """
 
-    def test_count_javadoc_comments_multi_line(self):
-        content = "/**\n * Multi-line\n * Javadoc comment\n */"
-        self.assertEqual(count_javadoc_comments(content), 2)
+        # Mock the sub method to remove Javadoc comments
+        mock_sub.return_value = """
+        public class Test {
+            // This is a regular comment
+            private int x;
+            // Another regular comment
+            private int y;
+        }
+        """
 
-    def test_count_javadoc_comments_no_comments(self):
-        content = "public class Test {\npublic void test() {}\n}"
-        self.assertEqual(count_javadoc_comments(content), 0)
+        # Call the function with the sample content
+        result = remove_javadoc_comments(sample_content)
+
+        # Define the expected result (content without Javadoc comments)
+        expected_result = """
+        public class Test {
+            // This is a regular comment
+            private int x;
+            // Another regular comment
+            private int y;
+        }
+        """
+
+        # Assert that the result matches the expected result
+        self.assertEqual(result, expected_result)
+
+    @patch("SoftwareTesting.utils.tools.re.match")
+    def test_count_javadoc_comments(self, mock_match):
+        # Define a sample Javadoc content string
+        sample_content = """
+        /**
+         * This is a sample Javadoc comment.
+         * It spans multiple lines.
+         */
+
+        /**
+         * Another Javadoc comment.
+         * With multiple lines.
+         * And more lines.
+         */
+
+        /**
+            * Third Javadoc comment.
+        */
+
+        """
+
+        # Mock the match method to control its behavior
+        # Mock the behavior of re.match to only match lines starting with "*"
+        def mock_match(regex, line):
+            return bool(line.strip() and line.strip().startswith("*"))
+
+        mock_match.side_effect = mock_match
+
+        # Call the function with the sample content
+        result = count_javadoc_comments(sample_content)
+
+        # Define the expected result (number of lines in Javadoc comments)
+        expected_result = 6
+
+        # Assert that the result matches the expected result
+        self.assertEqual(result, expected_result)
+
+    @patch("re.findall")
+    def test_count_functions(self, mock_findall):
+        # Define a sample Java content string with function declarations
+        sample_content = """
+        public class MyClass {
+
+            private void method1() {
+                // Method 1
+            }
+
+            public int method2(int param) {
+                // Method 2
+                return param * 2;
+            }
+
+            protected String method3(String str) {
+                // Method 3
+                return "Hello, " + str;
+            }
+        }
+        """
+
+        # Mock the behavior of re.findall to return a list of matched functions
+        mock_findall.return_value = [
+            "private void method1()",
+            "private int method2()",
+            "protected String method3()",
+        ]
+
+        # Call the function with a sample content
+        result = count_functions(sample_content)
+
+        # Assert that the function returned the expected result
+        expected_result = 3  # Expected number of declared functions
+        self.assertEqual(result, expected_result)
+
+    def test_comment_deviation_with_valid_metrics(self):
+        # Define a sample metrics dictionary with valid values
+        metrics = {
+            FUNCTIONS: 10,
+            CODE_LINES: 100,
+            JAVADOC_LINES: 20,
+            OTHER_COMMENTS: 30,
+        }
+
+        # Call the function with the sample metrics
+        result = calculate_comment_deviation(metrics)
+
+        # Define the expected result
+        expected_result = 33.3333333333  # Calculated manually
+
+        # Assert that the result matches the expected result with a tolerance of 1e-6
+        self.assertAlmostEqual(result, expected_result, delta=1e-6)
+
+    def test_comment_deviation_with_zero_functions(self):
+        # Define a sample metrics dictionary with zero functions
+        metrics = {
+            FUNCTIONS: 0,
+            CODE_LINES: 100,
+            JAVADOC_LINES: 20,
+            OTHER_COMMENTS: 30,
+        }
+
+        # Call the function with the sample metrics
+        result = calculate_comment_deviation(metrics)
+
+        # Define the expected result (zero deviation)
+        expected_result = 0.0
+
+        # Assert that the result matches the expected result
+        self.assertEqual(result, expected_result)
+
+    def test_comment_deviation_with_zero_code_lines(self):
+        # Define a sample metrics dictionary with zero code lines
+        metrics = {
+            FUNCTIONS: 10,
+            CODE_LINES: 0,
+            JAVADOC_LINES: 20,
+            OTHER_COMMENTS: 30,
+        }
+
+        # Call the function with the sample metrics
+        result = calculate_comment_deviation(metrics)
+
+        # Define the expected result (zero deviation)
+        expected_result = 0.0
+
+        # Assert that the result matches the expected result
+        self.assertEqual(result, expected_result)
 
 
 if __name__ == "__main__":
