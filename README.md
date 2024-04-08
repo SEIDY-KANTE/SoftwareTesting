@@ -37,7 +37,7 @@ A total of approximately 85 tests have been conducted:
 - 41 unit tests have been written.
   - 7 of them utilize the Faker library.
   - 10 of them use parameterized tests.
-- 19 integration tests should be written.
+- 19 integration tests have been written.
   - 3 of them utilize parameterized tests.
 
 **Screenshots from the Project:**

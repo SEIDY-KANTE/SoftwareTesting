@@ -2,6 +2,7 @@ from SoftwareTesting.models.CloneRepository import CloneRepositoryForm
 from parameterized import parameterized
 import unittest
 import os
+from SoftwareTesting.utils.config import INTERNET_CONNECTION
 
 """
 This test case class contains unit tests for the CloneRepositoryForm class without using mock objects.
@@ -33,7 +34,9 @@ class TestCloneRepositoryForm(unittest.TestCase):
     def test_valid_url(self):
         self.assertTrue(self.form.is_valid())
 
-    # This test needs internet connection to pass
+    @unittest.skipIf(
+        INTERNET_CONNECTION == "OFF", "This test needs internet connection"
+    )
     def test_clone_repo(self):
 
         # Call the clone_repo method
@@ -64,13 +67,14 @@ class TestCloneRepositoryForm(unittest.TestCase):
 
     ####################################### PARAMETERIZED #################################
 
-    # This test needs internet connection to pass
-
     @parameterized.expand(
         [
             ("https://github.com/SEIDY-KANTE/smart-cooling-device", True),
             ("https://github.com/SEIDY-KANTE/smart-cooling-device/failure", False),
         ]
+    )
+    @unittest.skipIf(
+        INTERNET_CONNECTION == "OFF", "This test needs internet connection"
     )
     def test_clone_repo(self, url, expected_success):
         form = CloneRepositoryForm(data={"url": url})
