@@ -50,6 +50,13 @@ A total of approximately 85 tests have been conducted:
    <img src="https://github.com/SEIDY-KANTE/SoftwareTesting/blob/main/Screenshots/test_output.png" alt="Test Output" />
 </div>
 
+***When there is a problem with the internet connection, it may cause an issue during the cloning test. Therefore, I found a solution that checks the internet connection, and if there is a problem, it skips the cloning test.***
+<div >
+  <img src="https://github.com/SEIDY-KANTE/SoftwareTesting/blob/main/Screenshots/internet_connection_checker.png" alt="Internet Connection Checker" width="400"  />
+  <img src="https://github.com/SEIDY-KANTE/SoftwareTesting/blob/main/Screenshots/clone_repo.png" alt="Clone Repo Test" width="400"  />
+  <img src="https://github.com/SEIDY-KANTE/SoftwareTesting/blob/main/Screenshots/connection_off_output.png" alt="Connection OFF Output" />
+</div>
+
 **Conclusion:**
 GitHub Java Class Analyzer automates the analysis of Java classes, saving time for developers and improving code quality. Both unit tests and integration tests provide a comprehensive testing process to ensure the accuracy and reliability of the application.
 
